@@ -65,17 +65,9 @@ class SalesOrderPlaceAfterObserver implements ObserverInterface
         if ($order->getCustomerIsGuest()) {
             try {
                 $customer = $this->customerRepository->get($order->getCustomerEmail());
-
-                $logfile = fopen(BP . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'debug.log', 'w+');
-                fwrite($logfile, 'customer exists' . PHP_EOL);
-                fclose($logfile);
-
                 $this->assignOrder->setCustomerDataAndSaveOrder($order, $customer);
             } catch (\Exception $e) {
                 // Customer does not exist, don't do anything
-                $logfile = fopen(BP . DIRECTORY_SEPARATOR . 'var' . DIRECTORY_SEPARATOR . 'log' . DIRECTORY_SEPARATOR . 'debug.log', 'w+');
-                fwrite($logfile, 'customer does not exist' . PHP_EOL);
-                fclose($logfile);
             }
 
         }
