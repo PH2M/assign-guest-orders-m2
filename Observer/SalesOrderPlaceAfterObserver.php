@@ -72,15 +72,4 @@ class SalesOrderPlaceAfterObserver implements ObserverInterface
 
         }
     }
-
-    /**
-     * @param string $email
-     * @return OrderCollection
-     */
-    private function getOrdersWithEmail(string $email)
-    {
-        return $this->orderCollectionFactory->create()
-                    ->addFieldToFilter('customer_id', ['null' => true])
-                    ->addFieldToFilter('customer_email', $email);
-    }
 }
