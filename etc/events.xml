@@ -16,7 +16,7 @@
  */
  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="customer_register_success">
-        <observer name="ph2m_assignguestorders_customer_register_success" instance="PH2M\AssignGuestOrders\Observer\CustomerRegisterSuccessObserver" />
+    <event name="sales_order_place_after">
+        <observer name="ph2m_assignguestorders_sales_order_place_after" instance="PH2M\AssignGuestOrders\Observer\SalesOrderPlaceAfterObserver" />
     </event>
 </config>
