@@ -69,7 +69,6 @@ class SalesOrderPlaceAfterObserver implements ObserverInterface
             } catch (\Exception $e) {
                 // Customer does not exist, don't do anything
             }
-
         }
     }
 }

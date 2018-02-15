@@ -17,6 +17,9 @@
 namespace PH2M\AssignGuestOrders\Model;
 
 use Magento\Sales\Model\OrderRepository;
+use Magento\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Customer\Model\ResourceModel\CustomerRepository;
 
 /**
  * Class Order
@@ -30,14 +33,36 @@ class Order
     private $orderRepository;
 
     /**
+     * @var OrderCollectionFactory
+     */
+    private $orderCollectionFactory;
+
+    /**
+     * @var CustomerRepository
+     */
+    private $customerRepository;
+
+    /**
+     * @var int
+     */
+    private $nbAssignedOrders = 0;
+
+    /**
      * Order constructor.
      * @param OrderRepository $orderRepository
+     * @param OrderCollectionFactory $orderCollectionFactory
+     * @param CustomerRepository $customerRepository
      */
     public function __construct(
-        OrderRepository $orderRepository
+        OrderRepository $orderRepository,
+        OrderCollectionFactory $orderCollectionFactory,
+        CustomerRepository $customerRepository
     ) {
-        $this->orderRepository = $orderRepository;
+        $this->orderRepository          = $orderRepository;
+        $this->orderCollectionFactory   = $orderCollectionFactory;
+        $this->customerRepository       = $customerRepository;
     }
+
     /**
      * @param OrderInterface $order
      * @param CustomerInterface $customer
@@ -60,6 +85,34 @@ class Order
 
         if ($saveOrder) {
             $this->orderRepository->save($order);
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function assignExistingGuestOrders()
+    {
+        /** @var OrderCollection $ordersCollection */
+        $ordersCollection = $this->orderCollectionFactory->create()
+                                 ->addFieldToFilter('customer_id', ['null' => true]);
+
+        $ordersCollection->walk([$this, 'assignOrderToCustomer']);
+
+        return $this->nbAssignedOrders;
+    }
+
+    /**
+     * @param OrderInterface $order
+     */
+    public function assignOrderToCustomer($order)
+    {
+        try {
+            $customer = $this->customerRepository->get($order->getCustomerEmail());
+            $this->setCustomerDataAndSaveOrder($order, $customer, true);
+            $this->nbAssignedOrders++;
+        } catch (\Exception $e) {
+            // Customer does not exist, don't do anything
         }
     }
 }
